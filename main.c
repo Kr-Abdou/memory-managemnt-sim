@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
 typedef struct partition
 {
     int start_adr;
@@ -87,7 +86,7 @@ void printlist (Queue *wait)
     node *current = wait->head;
     while (current != NULL)
     {
-        printf("[%s] | [%d] | [%d sec] -->",current->data.name,current->data.size,current->data.time);
+        printf("[%s]|[%d]-->",current->data.name,current->data.size);
         current = current->next;
     }
     printf("NULL");
@@ -108,32 +107,21 @@ void first_fit (part *partitons,int num_part,Queue *wait)
                 partitons[i].free = false ;
                 partitons[i].size = partitons[i].size - curr_prg.size;
                 found_part = true;
+                printf("your program is loaded into partition: [%d] free remaining size is %d kb",i,partitons[i].size);
                 break;
             }
         }
          if (!found_part)
         {
-           printf("\nError program %s couldnt be loaded in memory\n",curr_prg.name);
+           printf("\n error program %s couldnt be loaded in memory\n",curr_prg.name);
         }
-
         printf("\n program %s removed from list going to the next program\n",curr_prg.name);
         deleteQ(wait);
         current = current->next;
 
     }
         printf("\nthere is no next program you reached the last program\n");
-}
 
-void free_part (part *partitions ,int num_part,char* program_name)
-{
-    for (int i=0;i<num_part;i++)
-    {
-        if (!partitions[i].free && strcmp(program_name,"")==0){
-            partitions[i].free = true;
-            printf("\n Partition %d is freed.", i+1);
-            break;
-        }
-    }
 }
 
 
@@ -162,18 +150,15 @@ int main (){
     for (int i=0;i<num_prg;i++)
     {
         prg p;
-        printf("\nEnter the name of program %d: ",i+1);
-        scanf("%s",p.name);
-        printf("Enter the size of program %d: ",i+1);
-        scanf("%d",&p.size);
-        printf("Enter the time required to execute program %d: ",i+1);
-        scanf("%d",&p.time);
-
+        printf("enter the name and size of program in %d: ",i+1);
+        scanf("%s %d",p.name,&p.size);
         addtoQ(&waiting,p);
     }
 
     printf("\n--------the list is-------------------- :\n");
+    printf("\n");
     printlist(&waiting);
+    printf("\n");
     printf("\n--------------------------------------------\n");
 
 
