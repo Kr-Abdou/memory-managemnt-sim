@@ -124,56 +124,91 @@ void first_fit (part *partitons,int num_part,Queue *wait)
 
 }
 
-
-int main (){
-    int num_part,choice,num_prg;
-
-    printf("enter the number of partitions");
-    scanf("%d",&num_part);
-
-    part *partitions = create_part(num_part);
-    printf("\n------ PDT -------\n");
-    printf("\n| Partition Number | Starting Address | Size (in KB)     | Status           |\n");
-    printf("\n|------------------|------------------|------------------|-------------------\n");
-    for (int i=0;i<num_part;i++)
-    {
-        printf("| %-16d | %-16d | %-16d | %-16s |\n", i+1, partitions[i].start_adr, partitions[i].size, partitions[i].free ? "Free" : "Allocated");
-    }
-
+int main()
+{
+    int num_part, choice, num_prg;
+    part *partitions = NULL;
     Queue waiting;
     waiting.head = NULL;
     waiting.fin = NULL;
 
-    printf("\n Enter the number of programs: ");
-    scanf("%d",&num_prg);
+    while (1) {
+        printf("\n1. Create Partitions\n");
+        printf("2. Add Programs\n");
+        printf("3. Display Program Queue\n");
+        printf("4. Allocate Memory (First Fit)\n");
+        printf("5. Display Partition Table\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
 
-    for (int i=0;i<num_prg;i++)
-    {
-        prg p;
-        printf("enter the name and size of program in %d: ",i+1);
-        scanf("%s %d",p.name,&p.size);
-        addtoQ(&waiting,p);
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                if (partitions != NULL) {
+                    printf("\nPartitions already created!\n");
+                } else {
+                    printf("\nEnter the number of partitions: ");
+                    scanf("%d", &num_part);
+                    partitions = create_part(num_part);
+                    printf("\nPartition table created successfully!\n");
+                }
+                break;
+            case 2:
+                if (partitions == NULL) {
+                    printf("\nPlease create partitions first!\n");
+                } else {
+                    printf("\nEnter the number of programs: ");
+                    scanf("%d", &num_prg);
+                    for (int i = 0; i < num_prg; i++) {
+                        prg p;
+                        printf("\nEnter the name and size of program %d: ", i + 1);
+                        scanf("%s %d", p.name, &p.size);
+                        addtoQ(&waiting, p);
+                    }
+                    printf("\nPrograms added to the queue successfully!\n");
+                }
+                break;
+            case 3:
+                if (waiting.head == NULL) {
+                    printf("\nProgram queue is empty!\n");
+                } else {
+                    printf("\n--------Program Queue--------\n");
+                    printlist(&waiting);
+                    printf("\n-----------------------------\n");
+                }
+                break;
+            case 4:
+                if (partitions == NULL) {
+                    printf("\nPlease create partitions first!\n");
+                } else if (waiting.head == NULL) {
+                    printf("\nProgram queue is empty!\n");
+                } else {
+                    printf("\nAllocating memory using First Fit algorithm...\n");
+                    first_fit(partitions, num_part, &waiting);
+                    printf("\nMemory allocation completed!\n");
+                }
+                break;
+            case 5:
+                if (partitions == NULL) {
+                    printf("\nPlease create partitions first!\n");
+                } else {
+                    printf("\n--------Partition Table--------\n");
+                    printf("\n| Partition Number | Starting Address | Remaining Size (in KB) | Status |\n");
+                    printf("\n|------------------|------------------|------------------------|--------|\n");
+                    for (int i = 0; i < num_part; i++) {
+                        printf("| %-16d | %-16d | %-24d | %-6s |\n", i + 1, partitions[i].start_adr, partitions[i].size, partitions[i].free ? "Free" : "Allocated");
+                    }
+                    printf("\n------------------------------\n");
+                }
+                break;
+            case 6:
+                printf("\nExiting...\n");
+                exit(0);
+            default:
+                printf("\nInvalid choice! Please try again.\n");
+                break;
+        }
     }
-
-    printf("\n--------the list is-------------------- :\n");
-    printf("\n");
-    printlist(&waiting);
-    printf("\n");
-    printf("\n--------------------------------------------\n");
-
-
-
-    printf("\nUsing First Fit algorithm:\n");
-    first_fit(partitions, num_part, &waiting);
-
-    printf("\n------ PDT -------\n");
-    printf("\n| Partition Number | Starting Address | Remaining Size(in KB)| Status           |\n");
-    printf("\n|------------------|------------------|----------------------|------------------|\n");
-
-    for (int i=0;i<num_part;i++)
-    {
-        printf("| %-16d | %-16d | %-16d | %-20s |\n", i+1, partitions[i].start_adr, partitions[i].size, partitions[i].free ? "Free" : "Allocated");
-    }
-
     return 0;
 }
